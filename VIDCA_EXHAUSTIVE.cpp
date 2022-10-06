@@ -145,7 +145,7 @@ int main(int argc, char** argv){
 			//cout<<"Printing F_sets as succint space:\n"<<endl;
             //printSuccint(par->bF_sets,par->chiSize);
             initMemory(par);
-            //checkMemory(par);
+            if(CHECK) checkMemory(par);
 			//Call of Greedy alg.
 			auto start = high_resolution_clock::now(); 
 			greedyAlg(par);
@@ -164,7 +164,7 @@ int main(int argc, char** argv){
             }
             stop = high_resolution_clock::now(); 
             duration = duration_cast<microseconds>(stop - start);
-            //checkMemory(par);
+            if(CHECK) checkMemory(par);
             if(TEST){
 				testMemoryFilled(par);
                 testSolutionSets(par);

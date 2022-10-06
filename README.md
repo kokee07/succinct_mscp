@@ -18,16 +18,23 @@ Existen tres archivos principales, según el formato de trabajo a realizar:
     subn
     
     **Ejecución**
-./vheuristic  <filename>
-  **filename**: ruta al archivo con el dataset a utilizar.
 
-    
-- **VIDCA_HEURISTIC_2**: Código destinado al procesamiento y comparación entre Greedy y Vidca para dataset que respeten formato:
-    #elems #subsets
-    cost cardinalidad sub1
-    ...
-     cost cardinalidad subn
-     
-     **Ejecución**
-     ./vheuristic  <filename>
-  **filename**: ruta al archivo con el dataset a utilizar.
+./vheuristic  <file_name>
+
+  **file_name**: ruta al archivo con el dataset a utilizar.
+
+
+# Flags 
+
+Los archivos tienen 3 flags codeadas para cambiar el comportamiento de salida de los algoritmos:
+- **PRINT**: Valor binario 0/1. Permite activar o desactivar mensajes de seguimiento de cada paso del algoritmo.
+  	
+    **Sugerencia:** Dejar en 1 si es necesario debugear potenciales errores.
+
+- **CHECK**: Valor binario 0/1. Permite ejecutar las rutinas con prefijo **check** que imprimen en detalle la estructura y bitstring utilizada.
+
+    **Sugerencia:** Dejar en 0 durante experimentos, sólo usar para instancias de revisión manual.
+
+- **TEST**: Valor binario 0/1. Permite ejecutar la rutina de test de memoria para corroborar un output correcto de la heurística.
+
+    **Sugerencia:** Dejar en 0 durante experimentos, sólo usar para instancias de revisión manual.
