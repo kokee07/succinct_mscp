@@ -64,7 +64,6 @@ void checkMemory(ParProg *par);
 void preSetCover(ParProg *par);
 void setCover(ParProg *par);
 void h2(ParProg *par);
-void h3(ParProg *par);
 void greedyAlg(ParProg *par);
 //Subrutines.
 bool compareRep(item a,item b);
@@ -75,8 +74,6 @@ void printSuccint(vector<ulong*> bSets, int chiSize);
 int intersect(set<int> conjunto, set<int> chi);
 int countBits(ulong* e, int bits);
 int checkBit(ulong* e, int pos);
-int bestCandidate(ParProg *par, int pos);
-pair<int,int> bestC(ParProg *par, int pos);
 pair<int,int> findCandidate(ParProg* par, int index);
 //Test Methods
 void testMemoryFilled(ParProg *par);
@@ -95,7 +92,7 @@ int main(int argc, char** argv){
 	if(PRINT) cout << "Reading file..." <<FILENAME<< endl;
 	char prefix[80];
 	strcpy(prefix,FILENAME);
-	strcat(prefix,"_results_TESTEST");
+	strcat(prefix,"_results_EXH");
 	FILE *fp = fopen(prefix, "w" );
 	
     int experiment=1;
@@ -161,8 +158,6 @@ int main(int argc, char** argv){
             stop = high_resolution_clock::now(); 
             duration = duration_cast<microseconds>(stop - start);
             durVidca=duration.count();
-            //checkMemory(par);
-            //checkP(par);
             start = high_resolution_clock::now(); 
             if(par->I.filled!=par->I.bits){
                 setCover(par);
@@ -557,199 +552,9 @@ void h2(ParProg *par){
 		pos%=par->I.bits;
 
 	}
-//	checkMemory(par);
-	// cout<<"Left: ";
-	// for(int a:leftToCover){
-	// 	cout<<a<<" ";
-	// }
-	// cout<<endl;
-	// pos=0;
-	// while(pos<leftToCover.size()){
-	// 	int posElem = leftToCover[pos];
-	// 	//cout<<">checking: "<<posElem<<endl;
-	// 	if(!checkBit(par->I.mem,par->chi_map[par->P[posElem].value])){
-	// 		int setSelected=dist(par,posElem);
-	// 		if(CHECK) cout<<"### Best set option: "<<setSelected<<endl;
-	// 		for(int otherVal:par->F_sets[setSelected]){
-	// 			if(!checkBit(par->I.mem,par->chi_map[otherVal])){
-	// 				if(CHECK) cout<<"    value: "<<otherVal<<endl; 
-	// 				setBit64(par->I.mem,par->chi_map[otherVal]); //set the bit of each element in the same subset.
-	// 				par->I.filled++;
-	// 			}
-	// 		}
-	// 		setBit64(par->M.mem,setSelected);
-	// 		par->vidca_solution.insert(setSelected);
-	// 	}
-	// 	pos++;
-	// }
-	//checkMemory(par);
 }
 
 
-
-
-int bestCandidate(ParProg *par, int pos){
-// 	bool unique=false;
-// 	int uniquePos=0;
-// 	int uniqueValue=0;
-// 	int indexA=0;
-// 	int indexB=0;
-// 	bool toCheck;
-// 	for(int setA:par->P[pos].inSet){
-// 		//cout<<"A: "<<setA<<endl;
-// 		indexB=0;
-// 		toCheck=true;
-// 		ulong e=par->bF_sets[setA];
-// 		e&=(~(par->I.mem[0]));
-// 		int val=0;
-// 		for(int setB:par->P[pos].inSet){
-			
-// 			if(indexA!=indexB){
-// 				//cout<<"	B: "<<setB<<" ";
-// 				e&=(~(par->bF_sets[setB]));
-// 				//cout<<"suma "<<countBits(&e,W64)<<endl;
-// 			}
-// 			indexB++;
-// 			val=countBits(&e,W64);
-// 			if(val<=uniqueValue){
-// 			//	cout<<"\n	false"<<endl;
-// 				toCheck=false;
-// 				break;
-// 			}
-// 		}
-// 		if(toCheck){
-// 			if(val>uniqueValue){
-// 				//cout<<"	Set: "<<setA<<" cuenta: "<<val<<endl;
-// 				unique=true;
-// 				uniquePos=indexA;
-// 				uniqueValue=countBits(&e,W64);
-// 			}else{
-// 				if(val==uniqueValue){
-// 					unique=false;
-// 				}
-// 			}
-// 		}
-// 		indexA++;
-// 	}
-// 	if(unique) {
-// 		//cout<<"*******elección: "<<uniquePos<<"*********"<<endl;
-// 		return uniquePos;
-// 	}
-// 	//cout<<"--------------SKIP------------"<<endl;
- 	return 0;
-	
-}
-//third heuristic: take 2 rows to determinate best match.
-void h3(ParProg *par){
-	//sort(par->P,(par->P)+par->I.bits,compareRepMost);
-	if(CHECK){
-			checkP(par);
-		}	
-	
-	if(PRINT){
-		cout<<"---------------------------------------------------------"<<endl;
-		cout<<"            (H3) in progress."<<endl;
-		cout<<"---------------------------------------------------------"<<endl;
-	}
-	vector<int> leftToCover;
-	int pos= par->last_visited;
-	while(pos<((par->I.bits)-1) && par->I.filled<par->I.bits){
-		cout<<">>>VALOR: "<<par->P[pos].value<<"<<<"<<endl;
-		if(!checkBit(par->I.mem,par->chi_map[par->P[pos].value])){
-			pair<int,int> best=bestC(par,pos);
-			if(best.first){
-				int first_set=par->P[pos].inSet[best.first]; //select the index of the unique set that contain the element {P[pos]}	
-				set<int> firstSet(par->F_sets[first_set]); //load the set from f_sets
-				if(CHECK) cout<<"adding set: "<<first_set<<endl;
-				for(int eachVal:firstSet){
-					if(!checkBit(par->I.mem,par->chi_map[eachVal])){ //If the element isn't already included, include it
-						if(CHECK) cout<<"    value: "<<eachVal<<endl; 
-						setBit64(par->I.mem,par->chi_map[eachVal]); //set the bit of the element to 1.
-						par->I.filled++;
-					}
-				}
-				setBit64(par->M.mem,first_set);//set the bit of the subset to 1.
-				par->vidca_solution.insert(first_set); //add the identificator of the set visited.(0 to k)
-				cout<<"Set: "<<first_set<<" añadido."<<endl;
-				int second_set=par->P[pos+1].inSet[best.second]; //select the index of the unique set that contain the element {P[pos]}	
-				set<int> secondSet(par->F_sets[second_set]); //load the set from f_sets
-				if(CHECK) cout<<"adding set: "<<second_set<<endl;
-				for(int otherVal:secondSet){
-					if(!checkBit(par->I.mem,par->chi_map[otherVal])){ //If the element isn't already included, include it
-						if(CHECK) cout<<"    value: "<<otherVal<<endl; 
-						setBit64(par->I.mem,par->chi_map[otherVal]); //set the bit of the element to 1.
-						par->I.filled++;
-					}
-				}
-				setBit64(par->M.mem,second_set);//set the bit of the subset to 1.
-				par->vidca_solution.insert(second_set); //add the identificator of the set visited.(0 to k)
-				cout<<"Set: "<<second_set<<" añadido."<<endl;
-			}
-		
-		//pos%=par->I.bits;
-		}
-		pos=pos+2;
-//	checkMemory(par);
-	// cout<<"Left: ";
-	// for(int a:leftToCover){
-	// 	cout<<a<<" ";
-	// }
-	// cout<<endl;
-	// pos=0;
-	// while(pos<leftToCover.size()){
-	// 	int posElem = leftToCover[pos];
-	// 	//cout<<">checking: "<<posElem<<endl;
-	// 	if(!checkBit(par->I.mem,par->chi_map[par->P[posElem].value])){
-	// 		int setSelected=dist(par,posElem);
-	// 		if(CHECK) cout<<"### Best set option: "<<setSelected<<endl;
-	// 		for(int otherVal:par->F_sets[setSelected]){
-	// 			if(!checkBit(par->I.mem,par->chi_map[otherVal])){
-	// 				if(CHECK) cout<<"    value: "<<otherVal<<endl; 
-	// 				setBit64(par->I.mem,par->chi_map[otherVal]); //set the bit of each element in the same subset.
-	// 				par->I.filled++;
-	// 			}
-	// 		}
-	// 		setBit64(par->M.mem,setSelected);
-	// 		par->vidca_solution.insert(setSelected);
-	// 	}
-	// 	pos++;
-	// }
-	//checkMemory(par);
-}
-}
-pair<int,int> bestC(ParProg *par, int pos){
-// 	vector<int> solu;
-// 	int indexA=0;
-// 	int indexB=0;
-// 	int bestCardinality=0;
- 	pair<int,int> bestPair;
-// 	for(int setA:par->P[pos].inSet){
-// 		//cout<<"A: "<<setA<<endl;
-// 		indexB=0;
-// 		ulong binA=par->bF_sets[setA];
-// 		ulong binBoth;
-// 		int val=0;
-// 		for(int setB:par->P[pos+1].inSet){
-// 			//cout<<"	B: "<<setB<<" ";
-// 			binBoth=binA|(par->bF_sets[setB]);
-// 			binBoth&=(~(par->I.mem[0]));
-// 			//cout<<"suma "<<countBits(&binBoth,W64)<<endl;
-			
-// 			val=countBits(&binBoth,W64);
-// 			if(val>bestCardinality){
-// 				//cout<<"	Actualiza Best Pair.\n"<<endl;
-// 				bestCardinality=val;
-// 				bestPair.first=indexA;
-// 				bestPair.second=indexB;
-// 			}
-// 			indexB++;
-// 		}
-// 		indexA++;
-// 	}
-// 	//cout<<"Retorna: "<<bestPair.first<<"-"<<bestPair.second<<endl;
- 	return bestPair;
-	
-}
 int dist(ParProg *par,int index){
 	int mejorDist=0;
 	int mejorOpcion=0;
