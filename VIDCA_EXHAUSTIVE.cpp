@@ -63,7 +63,6 @@ void checkMemory(ParProg *par);
 //Main methods
 void preSetCover(ParProg *par);
 void setCover(ParProg *par);
-void h2(ParProg *par);
 void greedyAlg(ParProg *par);
 //Subrutines.
 bool compareRep(item a,item b);
@@ -447,7 +446,7 @@ void preSetCover(ParProg *par){
 		pos++;
 		par->last_visited=pos; //update the last visited element.
 	}
-	if(par->last_visited==0) cout<<" (H1) No añade nada."
+	if (!pos) cout<<"Ningun elemento agregado en H1"<<endl;
 	if(PRINT){
 		cout<<"---------------------------------------------------------"<<endl;
 	}
@@ -491,7 +490,7 @@ pair<int,int> findCandidate(ParProg* par, int index){
 	int numSets= (par->P[index].inSet).size();
 	int indice=index;
 	//cout<<"-------INDEX: "<<index<<"-------- NUMS: "<<numSets<<endl;
-	while(indice<par->chiSize && (par->P[indice].inSet).size()==numSets){
+	while(indice<par->chiSize && (int(par->P[indice].inSet.size())==numSets)){
 		value = par->P[indice].value;
 		if(!checkBit(par->I.mem,par->chi_map[value])){
 			for(int posibleSet:par->P[indice].inSet){
@@ -514,46 +513,6 @@ pair<int,int> findCandidate(ParProg* par, int index){
     
     return pair<int,int> (bestCandidate,bestSuma);
 }
-void h2(ParProg *par){
-	//sort(par->P,(par->P)+par->I.bits,compareRepMost);
-	if(CHECK){//CHECK){
-			checkP(par);
-		}	
-	
-	if(PRINT){
-		cout<<"---------------------------------------------------------"<<endl;
-		cout<<"            (H2*) in progress."<<endl;
-		cout<<"---------------------------------------------------------"<<endl;
-	}
-	vector<int> leftToCover;
-	int pos= par->last_visited;
-	while(pos<par->I.bits && par->I.filled<par->I.bits){
-		//cout<<">>>VALOR: "<<par->P[pos].value<<"<<<"<<endl;
-		if(!checkBit(par->I.mem,par->chi_map[par->P[pos].value])){
-			int best=bestCandidate(par,pos);
-			if(best){
-				int actual_set=par->P[pos].inSet[best]; //select the index of the unique set that contain the element {P[pos]}	
-				set<int> actual(par->F_sets[actual_set]); //load the set from f_sets
-				if(CHECK) cout<<"adding set: "<<actual_set<<endl;
-				for(int otherVal:actual){
-					if(!checkBit(par->I.mem,par->chi_map[otherVal])){ //If the element isn't already included, include it
-						if(CHECK) cout<<"    value: "<<otherVal<<endl; 
-						setBit64(par->I.mem,par->chi_map[otherVal]); //set the bit of the element to 1.
-						par->I.filled++;
-					}
-				}
-				setBit64(par->M.mem,actual_set);//set the bit of the subset to 1.
-				par->vidca_solution.insert(actual_set); //add the identificator of the set visited.(0 to k)
-			}else{
-				leftToCover.push_back(pos);
-			}
-		}
-		pos++;
-		pos%=par->I.bits;
-
-	}
-}
-
 
 int dist(ParProg *par,int index){
 	int mejorDist=0;
