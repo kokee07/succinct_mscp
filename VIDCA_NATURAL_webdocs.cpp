@@ -192,7 +192,6 @@ int main(int argc, char** argv){
 //Generate vector F of subsets S_i to S_n to simulate a universe of elements. 
 void read_Fset(ParProg *par, ifstream& file){
     string line,item;
-    int sets, col, row;
     //Drop a series of lines with no value to the unweighted version of the problem.
 
 	while (!file.eof()) {
@@ -208,8 +207,8 @@ void read_Fset(ParProg *par, ifstream& file){
         if (CHECK) cout<<endl;
         par->F_sets.push_back(act);
     }
-	par->ns=F_sets.size();
-    if (PRINT) cout<< "Sets: "<<sets<<endl;
+	par->ns=par->F_sets.size();
+    if (PRINT) cout<< "Sets: "<<par->ns<<endl;
     if (PRINT) cout<< "Subsets loaded."<<endl;
 }
 //Preprocess  of F to obtain universe, cardinality of each element and location.

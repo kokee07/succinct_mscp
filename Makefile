@@ -5,9 +5,9 @@ VEXHA=./include/BasicCDS.cpp VIDCA_EXHAUSTIVE.cpp
 VHEU=./include/BasicCDS.cpp VIDCA_HEURISTICS.cpp
 VNAT=./include/BasicCDS.cpp VIDCA_NATURAL.cpp
 VSPP=./include/BasicCDS.cpp VIDCA_NATURAL_sppwn.cpp
-VSTEP=./include/BasicCDS.cpp VIDCA_BIGSTEP.cpp
+VWEB=./include/BasicCDS.cpp VIDCA_NATURAL_webdocs.cpp
 Vtest=./include/BasicCDS.cpp test_lectura.cpp
-all: test
+all: natural webdocs
 vidca_1: VIDCA_EXHAUSTIVE.cpp
 	@echo " Building vidca Heuristic with solution provided"
 	@$(CPP) $(CPPFLAGS) $(INCLUDES) $(VEXHA) -o VIDCA_EXHAUSTIVE
@@ -20,12 +20,13 @@ natural: VIDCA_NATURAL.cpp
 	@echo " Building vidca Heuristic for natural sets"
 	@$(CPP) $(CPPFLAGS) $(INCLUDES) $(VNAT) -o VIDCA_NATURAL
 
+webdocs: VIDCA_NATURAL_webdocs.cpp
+	@echo " Building vidca Heuristic for natural WEB sets"
+	@$(CPP) $(CPPFLAGS) $(INCLUDES) $(VWEB) -o VIDCA_WEB
+
 SPP: VIDCA_NATURAL_sppwn.cpp
 	@echo " Building vidca Heuristic for natural sets SPP"
 	@$(CPP) $(CPPFLAGS) $(INCLUDES) $(VSPP) -o VIDCA_SPP
-bigstep: VIDCA_BIGSTEP.cpp
-	@echo " Building vidca big step heuristic for natural sets"
-	@$(CPP) $(CPPFLAGS) $(INCLUDES) $(VSTEP) -o VIDCA_BIGSTEP
 
 test: test_lectura.cpp
 	@echo " Building test"
