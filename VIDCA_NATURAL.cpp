@@ -91,7 +91,7 @@ int main(int argc, char** argv){
 	if(PRINT) cout << "Reading file..." <<FILENAME<< endl;
 	char prefix[80];
 	strcpy(prefix,FILENAME);
-	strcat(prefix,"_results_HEU");
+	strcat(prefix,"_results_NAT");
 	FILE *fp = fopen(prefix, "w" );
 	
     int experiment=1;
@@ -102,96 +102,85 @@ int main(int argc, char** argv){
 		ulong durTotalGreedy=0;
 		float cardinalidadVidca=0;
 		float cardinalidadGreedy=0;
-		string line,item;
-        getline(file,line);
         if(file.eof()) break;
-        int REP=stoi(line);
-        //REP = 1;
+        ulong durVidca=0;
+        ulong durGreedy=0;
         if(PRINT){
-            cout<<"Initializing repetitions..."<<endl;
-            cout<< "REP: "<<REP<<endl;
+            cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
+            cout<< "                            Exp 1#"<<endl;
+            cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
         }
-        for (int k = 0; k < REP; k++)
-        {	
-            ulong durVidca=0;
-            ulong durGreedy=0;
-            if(PRINT){
-				cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
-				cout<< "                            Exp #"<< experiment<<", Iter #"<<k+1<<"."<<endl;
-				cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
-			}
-			fprintf(fp,"Exp #%d, Iter #%d\n",experiment,k+1);
-            ParProg *par = new ParProg();
-            read_Fset(par,file);
-            auto ss = high_resolution_clock::now(); 
-            analyzeF(par);
-            auto tt = high_resolution_clock::now(); 
-            auto dur_analyze = duration_cast<microseconds>(tt-ss).count(); 
-            if(CHECK){
-                cout<<"Checking elements in P_structure:\n"<<endl;
-                checkP(par);
-                cout<<"Checking chi, Universe of elements:\n"<<endl;
-                checkChi(par);
-                cout<<"Checking F_sets read:\n"<<endl;
-                printVec(par->F_sets);
-				cout<<"Printing F_sets as succint space:\n"<<endl;
-                printSuccint(par->bF_sets,par->chiSize);
-            }
-			//cout<<"Printing F_sets as succint space:\n"<<endl;
-            //printSuccint(par->bF_sets,par->chiSize);
-            initMemory(par);
-            if(CHECK) checkMemory(par);
-			float coefficient = estimatePC(par);
-			fprintf(fp, "Exp. Coefficient: %f\n", coefficient);
-			//Call of Greedy alg.
-			auto start = high_resolution_clock::now(); 
-			//greedyAlg(par);
-			auto stop = high_resolution_clock::now(); 
-			auto duration = duration_cast<microseconds>(stop - start); 
-			durGreedy=duration.count();
-			cardinalidadGreedy+=par->greedy_solution.size();
-			start = high_resolution_clock::now(); 
-			preSetCover(par);
-			stop = high_resolution_clock::now(); 
-			duration = duration_cast<microseconds>(stop - start);
-			durVidca=duration.count();
-			if(!(par->last_visited)){
-				fprintf(fp,"No element included in h1.\n");
-			}else
-			{
-				fprintf(fp,"%u elements included in h1.\n",par->last_visited);
-			}
-			
-			start = high_resolution_clock::now(); 
-			if(par->I.filled!=par->I.bits){
-				setCover(par);
-			}
-			stop = high_resolution_clock::now(); 
-			duration = duration_cast<microseconds>(stop - start);
-			durVidca+=duration.count();
-			//checking vidca solution completeness.
-			if(TEST) testMemoryFilled(par);
-		
-			cout<<"G:"<<par->greedy_solution.size()<<", V:"<<par->vidca_solution.size()<<endl;
-            cardinalidadVidca+=par->vidca_solution.size();
-			fprintf(fp,"%lu %lu\n",par->greedy_solution.size(),par->vidca_solution.size());
-            fprintf(fp,"%lu %lu\n",durGreedy,durVidca+dur_analyze);
-            durTotalVidca+=durVidca+dur_analyze;
-            durTotalGreedy+=durGreedy;
-            if(PRINT) cout<<"Finalized #"<<k<<endl;
-			//cout<<"---------------------------------------------------------------------------"<<endl;
+        fprintf(fp,"Exp #%s\n",FILENAME);
+        ParProg *par = new ParProg();
+        read_Fset(par,file);
+        auto ss = high_resolution_clock::now(); 
+        analyzeF(par);
+        auto tt = high_resolution_clock::now(); 
+        auto dur_analyze = duration_cast<microseconds>(tt-ss).count(); 
+        if(CHECK){
+            cout<<"Checking elements in P_structure:\n"<<endl;
+            checkP(par);
+            cout<<"Checking chi, Universe of elements:\n"<<endl;
+            checkChi(par);
+            cout<<"Checking F_sets read:\n"<<endl;
+            printVec(par->F_sets);
+            cout<<"Printing F_sets as succint space:\n"<<endl;
+            printSuccint(par->bF_sets,par->chiSize);
         }
+        //cout<<"Printing F_sets as succint space:\n"<<endl;
+        //printSuccint(par->bF_sets,par->chiSize);
+        initMemory(par);
+        if(CHECK) checkMemory(par);
+        float coefficient = estimatePC(par);
+        fprintf(fp, "Exp. Coefficient: %f\n", coefficient);
+        //Call of Greedy alg.
+        auto start = high_resolution_clock::now(); 
+        greedyAlg(par);
+        auto stop = high_resolution_clock::now(); 
+        auto duration = duration_cast<microseconds>(stop - start); 
+        durGreedy=duration.count();
+        cardinalidadGreedy+=par->greedy_solution.size();
+         start = high_resolution_clock::now(); 
+        preSetCover(par);
+         stop = high_resolution_clock::now(); 
+         duration = duration_cast<microseconds>(stop - start);
+        durVidca=duration.count();
+        if(!(par->last_visited)){
+            fprintf(fp,"No element included in h1.\n");
+        }else
+        {
+            fprintf(fp,"%u elements included in h1.\n",par->last_visited);
+        }
+        
+        start = high_resolution_clock::now(); 
+        if(par->I.filled!=par->I.bits){
+            setCover(par);
+        }
+        stop = high_resolution_clock::now(); 
+        duration = duration_cast<microseconds>(stop - start);
+        durVidca+=duration.count();
+        //checking vidca solution completeness.
+        if(TEST) testMemoryFilled(par);
+    
+        cout<<"G:"<<par->greedy_solution.size()<<", V:"<<par->vidca_solution.size()<<endl;
+        cardinalidadVidca+=par->vidca_solution.size();
+        fprintf(fp,"%lu %lu\n",par->greedy_solution.size(),par->vidca_solution.size());
+        fprintf(fp,"%lu %lu\n",durGreedy,durVidca+dur_analyze);
+        durTotalVidca+=durVidca+dur_analyze;
+        durTotalGreedy+=durGreedy;
+        if(PRINT) cout<<"Finalized "<<endl;
+        //cout<<"---------------------------------------------------------------------------"<<endl;
         experiment++;
         cout << "################## " << endl;
-        cout << "Time taken by "<<REP<<" reps.: "
+        cout << "Time taken by 1 rep: "
 			<<durTotalVidca+durTotalGreedy<< " microseconds" << endl; 
-		cout << "Average time per cycle of Greedy: "<<durTotalGreedy/REP<< " microseconds"<<endl;
-		cout << "Average cardinality per cycle Greedy: "<<cardinalidadGreedy/REP<< " subsets."<<endl;
-		cout << "Average time per cycle of Vidca: "<<durTotalVidca/REP<< " microseconds"<<endl;
-		cout << "Average cardinality per cycle Vidca: "<<cardinalidadVidca/REP<< " subsets."<<endl;
+		cout << "Average time per cycle of Greedy: "<<durTotalGreedy<< " microseconds"<<endl;
+		cout << "Average cardinality per cycle Greedy: "<<cardinalidadGreedy<< " subsets."<<endl;
+		cout << "Average time per cycle of Vidca: "<<durTotalVidca<< " microseconds"<<endl;
+		cout << "Average cardinality per cycle Vidca: "<<cardinalidadVidca<< " subsets."<<endl;
 		cout<<"-----------------------------------------------------------------------------------------------"<<endl;
 
-        fprintf(fp,"%f %f\n",cardinalidadGreedy/REP,cardinalidadVidca/REP);
+        fprintf(fp,"%f %f\n",cardinalidadGreedy,cardinalidadVidca);
     }
 	file.close();
     fclose (fp);
@@ -204,14 +193,19 @@ int main(int argc, char** argv){
 void read_Fset(ParProg *par, ifstream& file){
     int sets;
     string line,item;
-	getline(file,line);
+	getline(file>>std::ws,line);
+    // istringstream iss(line);
+    // getline(iss, item, ' ');
+    // getline(iss, item, ' ');
     sets=stoi(line);
     par->ns=sets;
-    if (PRINT) cout<< "Sets: "<<sets<<endl;
+    if (1) cout<< "Sets: "<<sets<<endl;
     for (int j = 0; j < sets; j++)
     {
-        getline(file,line);
+        getline(file>>std::ws,line);
         istringstream iss(line);
+        getline(iss, item, ' ');
+        getline(iss, item, ' ');
         set<int> act;
         while (getline(iss, item, ' ')) {
                 if (CHECK) cout<<item<<" ";
@@ -382,10 +376,7 @@ void greedyAlg(ParProg *par){
 	}
 	
     while(chi.size()>0){
-		if(CHECK){
-			cout<<"Chi Left: "<<chi.size()<<endl;
-			cout<<"Length: "<<candidates.size()<<endl;
-		}
+		if(CHECK) cout<<"Length: "<<candidates.size()<<endl;
         int conjOptimo=0,mayorCover=0,iCover=0;  
 		for(pair<int,set<int>> par:candidates){
 			iCover=intersect(par.second,chi);
@@ -592,8 +583,8 @@ void testMemoryFilled(ParProg *par){
 	cout<<"Universe cardinality: "<<par->chiSize<<endl;
 	cout<<"Testing Vidca solution..."<<endl;;
 	int dif = par->chiSize-par->I.filled;
-	if(1){
-		if(1){
+	if(dif){
+		if(CHECK){
 			cout<<"I-Memory: ";
 			int cant=par->I.bits;
 			int size=8*sizeof(ulong);

@@ -18,7 +18,7 @@ using namespace cds;
 
 #define PRINT 0
 #define CHECK 0
-#define TEST 1
+#define TEST 0
 
 // Structure for each element of chi(universe).
 typedef struct{
@@ -145,7 +145,7 @@ int main(int argc, char** argv){
 			fprintf(fp, "Exp. Coefficient: %f\n", coefficient);
 			//Call of Greedy alg.
 			auto start = high_resolution_clock::now(); 
-			//greedyAlg(par);
+			greedyAlg(par);
 			auto stop = high_resolution_clock::now(); 
 			auto duration = duration_cast<microseconds>(stop - start); 
 			durGreedy=duration.count();
@@ -592,8 +592,8 @@ void testMemoryFilled(ParProg *par){
 	cout<<"Universe cardinality: "<<par->chiSize<<endl;
 	cout<<"Testing Vidca solution..."<<endl;;
 	int dif = par->chiSize-par->I.filled;
-	if(1){
-		if(1){
+	if(dif){
+		if(CHECK){
 			cout<<"I-Memory: ";
 			int cant=par->I.bits;
 			int size=8*sizeof(ulong);

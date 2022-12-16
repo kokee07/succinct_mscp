@@ -63,7 +63,7 @@ void checkMemory(ParProg *par);
 //Main methods
 void preSetCover(ParProg *par);
 void setCover(ParProg *par);
-void greedyAlg(ParProg *par);
+void h3(ParProg *par);
 //Subrutines.
 float estimatePC(ParProg *par);
 bool compareRep(item a,item b);
@@ -75,6 +75,7 @@ int intersect(set<int> conjunto, set<int> chi);
 int countBits(ulong* e, int bits);
 int checkBit(ulong* e, int pos);
 pair<int,int> findCandidate(ParProg* par, int index);
+pair<pair<int,int>,int> bestC(ParProg* par, int index);
 //Test Methods
 void testMemoryFilled(ParProg *par);
 
@@ -91,7 +92,7 @@ int main(int argc, char** argv){
 	if(PRINT) cout << "Reading file..." <<FILENAME<< endl;
 	char prefix[80];
 	strcpy(prefix,FILENAME);
-	strcat(prefix,"_results_HEU");
+	strcat(prefix,"_results_HEU_H3");
 	FILE *fp = fopen(prefix, "w" );
 	
     int experiment=1;
@@ -99,9 +100,9 @@ int main(int argc, char** argv){
 	auto ss = high_resolution_clock::now(); 
     while (!file.eof()) {
 		ulong durTotalVidca=0;
-		ulong durTotalGreedy=0;
+		ulong durTotalH3=0;
 		float cardinalidadVidca=0;
-		float cardinalidadGreedy=0;
+		float cardinalidadH3=0;
 		string line,item;
         getline(file,line);
         if(file.eof()) break;
@@ -114,7 +115,7 @@ int main(int argc, char** argv){
         for (int k = 0; k < REP; k++)
         {	
             ulong durVidca=0;
-            ulong durGreedy=0;
+            ulong durH3=0;
             if(PRINT){
 				cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
 				cout<< "                            Exp #"<< experiment<<", Iter #"<<k+1<<"."<<endl;
@@ -145,11 +146,11 @@ int main(int argc, char** argv){
 			fprintf(fp, "Exp. Coefficient: %f\n", coefficient);
 			//Call of Greedy alg.
 			auto start = high_resolution_clock::now(); 
-			//greedyAlg(par);
+			cout<<"greedy omit"<<endl;
 			auto stop = high_resolution_clock::now(); 
 			auto duration = duration_cast<microseconds>(stop - start); 
-			durGreedy=duration.count();
-			cardinalidadGreedy+=par->greedy_solution.size();
+			durH3=duration.count();
+			cardinalidadH3+=par->greedy_solution.size();
 			start = high_resolution_clock::now(); 
 			preSetCover(par);
 			stop = high_resolution_clock::now(); 
@@ -164,7 +165,7 @@ int main(int argc, char** argv){
 			
 			start = high_resolution_clock::now(); 
 			if(par->I.filled!=par->I.bits){
-				setCover(par);
+				h3(par);
 			}
 			stop = high_resolution_clock::now(); 
 			duration = duration_cast<microseconds>(stop - start);
@@ -175,23 +176,23 @@ int main(int argc, char** argv){
 			cout<<"G:"<<par->greedy_solution.size()<<", V:"<<par->vidca_solution.size()<<endl;
             cardinalidadVidca+=par->vidca_solution.size();
 			fprintf(fp,"%lu %lu\n",par->greedy_solution.size(),par->vidca_solution.size());
-            fprintf(fp,"%lu %lu\n",durGreedy,durVidca+dur_analyze);
+            fprintf(fp,"%lu %lu\n",durH3,durVidca+dur_analyze);
             durTotalVidca+=durVidca+dur_analyze;
-            durTotalGreedy+=durGreedy;
+            durTotalH3+=durH3;
             if(PRINT) cout<<"Finalized #"<<k<<endl;
 			//cout<<"---------------------------------------------------------------------------"<<endl;
         }
         experiment++;
         cout << "################## " << endl;
         cout << "Time taken by "<<REP<<" reps.: "
-			<<durTotalVidca+durTotalGreedy<< " microseconds" << endl; 
-		cout << "Average time per cycle of Greedy: "<<durTotalGreedy/REP<< " microseconds"<<endl;
-		cout << "Average cardinality per cycle Greedy: "<<cardinalidadGreedy/REP<< " subsets."<<endl;
+			<<durTotalVidca+durTotalH3<< " microseconds" << endl; 
+		cout << "Average time per cycle of Greedy: "<<durTotalH3/REP<< " microseconds"<<endl;
+		cout << "Average cardinality per cycle Greedy: "<<cardinalidadH3/REP<< " subsets."<<endl;
 		cout << "Average time per cycle of Vidca: "<<durTotalVidca/REP<< " microseconds"<<endl;
 		cout << "Average cardinality per cycle Vidca: "<<cardinalidadVidca/REP<< " subsets."<<endl;
 		cout<<"-----------------------------------------------------------------------------------------------"<<endl;
 
-        fprintf(fp,"%f %f\n",cardinalidadGreedy/REP,cardinalidadVidca/REP);
+        fprintf(fp,"%f %f\n",cardinalidadH3/REP,cardinalidadVidca/REP);
     }
 	file.close();
     fclose (fp);
@@ -294,7 +295,6 @@ float estimatePC(ParProg *par){
 	}
 	return partialSum/par->chiSize;
 }
-//
 //Check cardinality of Chi and his elements.
 void checkChi(ParProg *par){
 	cout << "|X| = "<<par->chiSize<<endl;
@@ -364,56 +364,90 @@ void checkMemory(ParProg *par){
     cout<<"\ncount: "<<c<<endl;
 	cout<<"---------------------------------------------------------"<<endl;
 }
-
 //Greedy Algorithm
-void greedyAlg(ParProg *par){
-    if(PRINT){
+void h3(ParProg *par){
+	// int index = par->last_visited;
+	// pair<pair<int,int>,int> setSelected = bestC(par,index);
+	// cout<< "Sets: "<<(setSelected.first).first<<", "<<(setSelected.first).second<<endl;
+	// cout<< "//// With: "<<(setSelected.second)<<endl;
+    int index = par->last_visited;//We scan over P from index m to n  (P[m..n])
+	if(PRINT){
+		cout<<"            (H3) k-step in progress."<<endl;
 		cout<<"---------------------------------------------------------"<<endl;
-		cout<<"            Greedy Algorithm in progress."<<endl;
-		cout<<"---------------------------------------------------------"<<endl;
-		cout<<"Greedy Search over F_sets."<<endl;
 	} 
-    set<int> chi(par->chi); 
-	map<int,set<int>> candidates;
-	int posicionAbs=0;
-	for (set<int> each: par->F_sets){
-		candidates[posicionAbs]=each;
-		posicionAbs++;
-	}
-	
-    while(chi.size()>0){
-		if(CHECK){
-			cout<<"Chi Left: "<<chi.size()<<endl;
-			cout<<"Length: "<<candidates.size()<<endl;
+	while(index<par->chiSize && par->I.filled<par->I.bits){
+		int value = par->P[index].value;
+		
+		//cout<<"REVISANDO: "<<index<<", "<<checkBit(par->I.mem,par->chi_map[value])<<" - "<<par->chi_map[value]<<endl;
+		if(!checkBit(par->I.mem,par->chi_map[value])){
+            pair<pair<int,int>,int> setSelected = bestC(par,index);
+            if(CHECK){
+                cout<< "Sets: ("<<(setSelected.first).first<<", "<<(setSelected.first).second<<")."<<endl;
+                cout<<"     Partiendo con: "<<par->I.filled<<" elementos."<<endl;
+            }
+            
+            for (int pos = 0; pos < par->I.nW; pos++)
+            {
+               par->I.mem[pos]|=(par->bF_sets[(setSelected.first).first])[pos];
+			   par->I.mem[pos]|=(par->bF_sets[(setSelected.first).second])[pos];
+            }
+            par->I.filled+=setSelected.second;
+            if(CHECK) cout<<"    Termina con: "<<par->I.filled<<" elementos."<<endl;
+
+			par->vidca_solution.insert((setSelected.first).first);
+			par->vidca_solution.insert((setSelected.first).second);
 		}
-        int conjOptimo=0,mayorCover=0,iCover=0;  
-		for(pair<int,set<int>> par:candidates){
-			iCover=intersect(par.second,chi);
-			if(iCover>mayorCover){
-				conjOptimo=par.first;
-				mayorCover=iCover;
+		if(checkBit(par->I.mem,par->chi_map[value])) index++;
+	}
+
+}
+
+pair<pair<int,int>,int> bestC(ParProg *par, int pos){
+//int bestC(ParProg *par, int pos){
+	vector<int> solu;
+	int indexA=pos;
+	int indexB;
+	ulong binBoth;
+	int bestCardinality=0;
+	int reps = par->P[pos].repetitions;
+	pair<int,int> bestPair;
+	while(par->P[indexA].repetitions==reps){
+		indexB = indexA+1;
+		for(int Aset:par->P[indexA].inSet){
+			//cout<< "Aset: "<<Aset<<endl;
+			ulong* binA = par->bF_sets[Aset];
+			while(par->P[indexB].repetitions==reps){
+				
+				for(int Bset:par->P[indexB].inSet){
+					//cout<< "---- Bset: "<<Bset<<endl;
+					if(Aset!=Bset){
+						int sumAct=0;
+						ulong* binB = par->bF_sets[Bset];
+						for (int pos = 0; pos < par->I.nW; pos++)
+						{	
+							binBoth = binA[pos]|binB[pos];
+							binBoth= binBoth&(~(par->I.mem[pos]));
+							sumAct+=countBits(&binBoth,W64);
+							//cout<<"Suma: "<<sumAct<<endl;
+						}
+						if(sumAct>bestCardinality){
+							if (CHECK) cout<<"	Actualiza Best Pair.\n"<<endl;
+							bestCardinality=sumAct;
+							// bestPair.first=indexA;
+							// bestPair.second=indexB;
+							bestPair.first=Aset;
+							bestPair.second=Bset;
+						}
+					}
+				}
+			indexB++;
 			}
 		}
-        if(CHECK){
-            cout<<"--Best candidate set : "<< conjOptimo+1;
-            cout<<"  >Covering: "<<mayorCover<<" new elements."<<endl;
-        }
-        for (int val:candidates[conjOptimo])
-        {
-           // if(CHECK) cout<<val << " ";
-            chi.erase(val);
-		}
-		candidates.erase(conjOptimo);
-        par->greedy_solution.insert(conjOptimo);
-    }
-    if(TEST){
-		cout<<"Greedy Alg. solution: "<<endl;
-        cout<<">>Cardinality: "<<par->greedy_solution.size()<<", Sets: ";
-		for(int j:par->greedy_solution){
-			cout<<j<<" ";
-		}
-		cout<<endl;
-    }
+		indexA++;
+	}
+	//cout<<"Retorna: "<<bestPair.first<<"-"<<bestPair.second<<endl;
+	return pair<pair<int,int>,int> (bestPair,bestCardinality);
+	
 }
 //Preprocess for setCover heuristic.
 void preSetCover(ParProg *par){
@@ -592,8 +626,8 @@ void testMemoryFilled(ParProg *par){
 	cout<<"Universe cardinality: "<<par->chiSize<<endl;
 	cout<<"Testing Vidca solution..."<<endl;;
 	int dif = par->chiSize-par->I.filled;
-	if(1){
-		if(1){
+	if(dif){
+		if(CHECK){
 			cout<<"I-Memory: ";
 			int cant=par->I.bits;
 			int size=8*sizeof(ulong);
