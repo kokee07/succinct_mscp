@@ -135,7 +135,7 @@ int main(int argc, char** argv){
         fprintf(fp, "Exp. Coefficient: %f\n", coefficient);
         //Call of Greedy alg.
         auto start = high_resolution_clock::now(); 
-        greedyAlg(par);
+        //greedyAlg(par);
         auto stop = high_resolution_clock::now(); 
         auto duration = duration_cast<microseconds>(stop - start); 
         durGreedy=duration.count();
