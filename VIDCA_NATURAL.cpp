@@ -194,12 +194,9 @@ void read_Fset(ParProg *par, ifstream& file){
     int sets;
     string line,item;
 	getline(file>>std::ws,line);
-    // istringstream iss(line);
-    // getline(iss, item, ' ');
-    // getline(iss, item, ' ');
     sets=stoi(line);
     par->ns=sets;
-    if (1) cout<< "Sets: "<<sets<<endl;
+    if (PRINT) cout<< "Sets: "<<sets<<endl;
     for (int j = 0; j < sets; j++)
     {
         getline(file>>std::ws,line);

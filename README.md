@@ -5,24 +5,40 @@ Existen tres archivos principales, según el formato de trabajo a realizar:
 - **VIDCA_EXHAUSTIVE**: Código destinado al procesamiento y comparación entre la solución Exhaustiva, Greedy y Vidca para dataset generado de manera aleatoria según los argumentos.
 
   	**Ejecución**
-./vexhaustive  <n_sets> <MAX_val>
-  **n_sets**: el número de subconjuntos a generar.
-  **MAX_val**: el máximo valor númerico mayor posible a generar entre 0 y max_val. 
+./VIDCA_EXHAUSTIVE  <n_sets> <MAX_val>
+
+  - **n_sets**: el número de subconjuntos a generar.
+
+  - **MAX_val**: el máximo valor númerico mayor posible a generar entre 0 y max_val. 
   No es posible modificar el número de elementos por subconjunto actualmente.
   
 - **VIDCA_HEURISTIC**: Código destinado al procesamiento y comparación entre Greedy y Vidca para dataset que respeten formato:
-    Rep
-    #subsets
-    sub1
-    ..
-    subn
     
+    Rep\
+    #subsets\
+    sub1\
+    ..\
+    subn
+
+  	**Ejecución**
+./VIDCA_HEURISTIC  <file_name>
+
+  - **file_name**: ruta al archivo con el dataset a utilizar.
+
+- **VIDCA_NATURAL**: Código destinado al procesamiento y comparación entre Greedy y Vidca para dataset que respeten formato:
+    
+    Rep\
+    #universe #subsets\
+    peso cantidadElem sub1\
+    ..\
+    peso cantidadElem subn
+
+    - **NOTA:** Peso y cantidadElem son dos variables descartadas para este caso, pero relevante en otros datasets.
+  	
     **Ejecución**
+./VIDCA_NATURAL <file_name>
 
-./vheuristic  <file_name>
-
-  **file_name**: ruta al archivo con el dataset a utilizar.
-
+  - **file_name**: ruta al archivo con el dataset a utilizar.
 
 # Flags 
 
