@@ -5,7 +5,7 @@ VEXHA=./include/BasicCDS.cpp VIDCA_EXHAUSTIVE.cpp
 VHEU=./include/BasicCDS.cpp VIDCA_HEURISTICS.cpp
 VNAT=./include/BasicCDS.cpp VIDCA_NATURAL.cpp
 
-all: natural webdocs
+all: clean vidca_1 vidca_2 natural
 vidca_1: VIDCA_EXHAUSTIVE.cpp
 	@echo " Building vidca Heuristic with solution provided"
 	@$(CPP) $(CPPFLAGS) $(INCLUDES) $(VEXHA) -o VIDCA_EXHAUSTIVE
