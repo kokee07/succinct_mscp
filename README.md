@@ -47,8 +47,8 @@ Repository dedicated to the processing and comparison of algorithms for the MSC 
     sub1\
     ..\
     subn\
-
-  **Execution:** ./runMSCP <fileName> <#threads>
+  
+  **Execution:** ./runMSCP <file_name> <#threads>
   
   **NOTE:** #threads should be an integer value to define the numbers of threads to be used in the execution.
 
