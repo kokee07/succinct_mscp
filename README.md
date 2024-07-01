@@ -49,6 +49,7 @@ Repository dedicated to the processing and comparison of algorithms for the MSC 
     subn\
 
   **Execution:** ./runMSCP <fileName> <#threads>
+  
   **NOTE:** #threads should be an integer value to define the numbers of threads to be used in the execution.
 
   
