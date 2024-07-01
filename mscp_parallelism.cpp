@@ -62,7 +62,6 @@ typedef struct
 	item *P;  // elements of chi, their cardinality and which subset included them.
 	ifstream file;
 	int numThreads;
-	int threshold;
 
 } ParProg;
 
@@ -100,9 +99,9 @@ void testMemoryFilled(ParProg *par);
 
 int main(int argc, char **argv)
 {
-	if (argc != 4)
+	if (argc != 3)
 	{
-		cout << "FILE: Execution Error! call: ./runMSCP <fileName> <#threads> <#threshold>" << endl;
+		cout << "FILE: Execution Error! call: ./runMSCP <fileName> <#threads>" << endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -115,13 +114,10 @@ int main(int argc, char **argv)
 	strcpy(prefix, FILENAME);
 	strcat(prefix, "_results_");
 	strcat(prefix, argv[2]);
-	strcat(prefix, "_");
-	strcat(prefix, argv[3]);
 
 	ifstream file(FILENAME);
 	int numThreads = atoi(argv[2]);
 	omp_set_num_threads(numThreads);
-	int threshold = atoi(argv[3]);
 	FILE *fp = fopen(prefix, "w");
 
 	auto sT = high_resolution_clock::now();
@@ -142,10 +138,9 @@ int main(int argc, char **argv)
 			cout << "                            Exp #1" << endl;
 			cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << endl;
 		}
-		fprintf(fp, "Exp #Threads %d - #Threshold %d\n", numThreads, threshold);
+		fprintf(fp, "Exp #Threads %d\n", numThreads);
 		ParProg *par = new ParProg();
 		par->numThreads = numThreads;
-		par->threshold = threshold;
 		readFsets(par, file);
 		auto ss = high_resolution_clock::now();
 		generateMatrixNM(par);
@@ -813,7 +808,6 @@ pair<int, int> findCandidate(ParProg *par, int index)
 	const int msize = par->ns;
 	const int nW = par->I.nW;
 	const int numThreads = par->numThreads;
-	const int threshold = par->threshold;
 
 	int gradeSet = (par->P[index].inSet).size();
 	int bestCandidate = 0;
