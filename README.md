@@ -40,6 +40,19 @@ Repository dedicated to the processing and comparison of algorithms for the MSC 
 
   **Execution:** ./VIDCA_NATURAL <file_name>
 
+- **mscp_parallelism:** Code for processing and comparing the Greedy and **Parallel** Vidca solutions for datasets that follow this format:
+
+    Rep\
+    #universe #subsets\
+    sub1\
+    ..\
+    subn\
+  
+  **Execution:** ./runMSCP <file_name> <#threads>
+  
+  **NOTE:** #threads should be an integer value to define the numbers of threads to be used in the execution.
+
+  
 [1]. J. Delgado, H. Ferrada and C. Navarro. An Efficient Approximate Greedy Algorithm to Solve the Minimum Set Cover Problem.
-Submitted to Computational Sciences Journal [2023].
+Submitted to Computational Sciences Journal [2024].
 
