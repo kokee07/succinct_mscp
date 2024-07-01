@@ -53,6 +53,6 @@ Repository dedicated to the processing and comparison of algorithms for the MSC 
   **NOTE:** #threads should be an integer value to define the numbers of threads to be used in the execution.
 
   
-[1]. J. Delgado, H. Ferrada and C. Navarro. An Efficient Approximate Greedy Algorithm to Solve the Minimum Set Cover Problem.
+[1]. J. Delgado, H. Ferrada and C. Navarro. A Succinct and Approximate Greedy Algorithm for the Minimum Set Cover Problem.
 Submitted to Computational Sciences Journal [2024].
 
